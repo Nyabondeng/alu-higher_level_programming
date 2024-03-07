@@ -1,4 +1,4 @@
-i#!/usr/bin/python3
+#!/usr/bin/python3
 """Square inherits from Rectangle which inherits from BaseGeometry
 """
 Rectangle = __import__('9-rectangle').Rectangle
