@@ -1,13 +1,10 @@
 #!/usr/bin/python3
-
-"""A class that inherits."""
+''' No modules imported '''
 
 
 class MyList(list):
-    """Contains list."""
+    '''Our base class is list '''
 
     def print_sorted(self):
-        """Prints sorted list."""
-
-        sorted_list = sorted(self)
-        print(sorted_list)
+        ''' The function to print sorted list in ascending order '''
+        print(sorted(self))
