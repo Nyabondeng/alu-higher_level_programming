@@ -1,3 +1,4 @@
+-- creates the MySQL server user user_0d_1 and grant all priviledges
 MYSQL_USER="user_0d_1"
 MYSQL_PASSWORD="user_0d_1_pwd"
 
