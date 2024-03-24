@@ -1,3 +1,10 @@
--- creates the MySQL server user user_0d_1 and grant all priviledges
-CREATE USER IF NOT EXISTS  user_0d_1@localhost IDENTIFIED BY 'user_0d_1_pwd';
-GRANT ALL PRIVILEGES ON * . * TO  user_0d_1@localhost;
+#!/bin/bash
+
+# MySQL user details
+MYSQL_USER="user_0d_1"
+MYSQL_PASSWORD="user_0d_1_pwd"
+
+# MySQL command to create user with all privileges
+MYSQL_CREATE_USER="CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+MYSQL_GRANT_PRIVILEGES="GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'localhost' WITH GRANT OPTION;"
+MYSQL_FLUSH_PRIVILEGES="FLUSH PRIVILEGES;"
