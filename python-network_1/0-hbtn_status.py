@@ -9,4 +9,8 @@ if __name__ == "__main__":
         print('Body response:')
         print('\t- type: {}'.format(type(content)))
         print('\t- content: {}'.format(content))
-        print('\t- utf8 content: {}'.format(content.decode("utf-8")))
+        try:
+            print('\t- utf8 content: {}'.format(content.decode("utf-8")))
+        except UnicodeDecodeError as e:
+            print('\t- Error decoding UTF-8 content:', e)
+            print('\t- utf8 content: {}'.format(content.decode("utf-8", "ignore")))
