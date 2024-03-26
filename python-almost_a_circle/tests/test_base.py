@@ -1,139 +1,76 @@
 #!/usr/bin/python3
-""" base.py """
 
-import json
+""" test_base.py """
+
+import os
+import unittest
+
+from models.base import Base
+from models.rectangle import Rectangle
+from models.square import Square
 
 
-class Base():
-    """ Class Base """
-    __nb_objects = 0
+class TestBase(unittest.TestCase):
+    """Test class for Base"""
 
-    def __init__(self, id=None):
-        """ Init """
-        self.id = id
-
-    @property
-    def id(self):
-        return self.__id
-
-    @id.setter
-    def id(self, val):
-        if val is None:
-            Base.__nb_objects += 1
-            self.__id = self.__nb_objects
-        else:
-            self.__id = val
-
-    @staticmethod
-    def to_json_string(list_dictionaries):
+    def test_basic(self):
         """Doc"""
-        if list_dictionaries is None or \
-                len(list_dictionaries) == 0:
-            return "[]"
-        return json.dumps(list_dictionaries)
+        base = Base()
+        base_1 = Base()
+        base_89 = Base(89)
+        self.assertEqual(base.id, 1)
+        self.assertEqual(base_1.id, 2)
+        self.assertEqual(base_89.id, 89)
 
-    @classmethod
-    def save_to_file(cls, list_objs):
-        """ save json rep to a file """
-        objs_dict_rep = []
+    def test_to_json_string(self):
+        """Doc"""
+        self.assertEqual(Base.to_json_string(None), "[]")
+        self.assertEqual(Base.to_json_string([]), "[]")
+        self.assertEqual(Base.to_json_string([{'id': 12}]), '[{"id": 12}]')
+        self.assertEqual(type(Base.to_json_string([{'id': 12}])), str)
 
-        with open(cls.__name__ + '.json', 'w', encoding='utf-8') as f:
-            if list_objs is None or len(list_objs) < 1:
-                f.write("[]")
-                return
+    def test_from_json_string(self):
+        """Doc"""
+        self.assertEqual(Base.from_json_string(None), [])
+        self.assertEqual(Base.from_json_string("[]"), [])
+        self.assertEqual(Base.from_json_string('[{"id": 89}]'), [{'id': 89}])
+        self.assertEqual(type(Base.from_json_string('[{"id": 89}]')), list)
 
-            for obj in list_objs:
-                objs_dict_rep.append(obj.to_dictionary())
-            f.write(cls.to_json_string(objs_dict_rep))
+    def test_save_to_file(self):
+        """Doc"""
+        Base._Base__nb_objects = 0
 
-    @staticmethod
-    def from_json_string(json_string):
-        """ return list of json string """
-        if json_string is None or len(json_string) < 1:
-            return []
+        Square.save_to_file(None)
 
-        return json.loads(json_string)
+        self.assertTrue(os.path.isfile("Square.json"))
 
-    @classmethod
-    def create(cls, **dictionary):
-        """ return an updated instance with all attributes """
-        if cls.__name__ == 'Rectangle':
-            dummy = cls(3, 6)
-        elif cls.__name__ == 'Square':
-            dummy = cls(5)
-        dummy.update(**dictionary)
-        return dummy
+        with open("Square.json") as file:
+            self.assertEqual(file.read(), '[]')
 
-    @classmethod
-    def load_from_file(cls):
-        """returns a list of instances from file"""
-        try:
-            with open(cls.__name__ + ".json", "r") as file:
-                serialized_content = file.read()
-        except FileNotFoundError:
-            return list()
+        Square.save_to_file([])
+        with open("Square.json") as file:
+            self.assertEqual(file.read(), '[]')
+            self.assertEqual(type(file.read()), str)
 
-        deserialized_content = cls.from_json_string(serialized_content)
+        Square.save_to_file([Square(1)])
+        with open("Square.json") as file:
+            self.assertEqual(file.read(),
+                             '[{"id": 1, "size": 1, "x": 0, "y": 0}]')
+        Base._Base__nb_objects = 0
 
-        instances_list = []
-        for instance_dict in deserialized_content:
-            instances_list.append(cls.create(**instance_dict))
-        return instances_list
+        Rectangle.save_to_file(None)
+        self.assertTrue(os.path.isfile("Rectangle.json"))
 
-    @classmethod
-    def save_to_file_csv(cls, list_objs):
-        """ Save to a CSV file """
+        with open("Rectangle.json") as file:
+            self.assertEqual(file.read(), '[]')
 
-        fn = cls.__name__ + ".csv"
-        if fn == "Rectangle.csv":
-            fields = ["id", "width", "height", "x", "y"]
-        else:
-            fields = ["id", "size", "x", "y"]
-        with open(fn, mode="w", newline="") as myFile:
-            if list_objs is None:
-                writer = csv.writer(myFile)
-                writer.writerow([[]])
-            else:
-                writer = csv.DictWriter(myFile, fieldnames=fields)
-                writer.writeheader()
-                for x in list_objs:
-                    writer.writerow(x.to_dictionary())
+        Rectangle.save_to_file([])
+        with open("Rectangle.json") as file:
+            self.assertEqual(file.read(), '[]')
+            self.assertEqual(type(file.read()), str)
 
-    @classmethod
-    def load_from_file_csv(cls):
-        """ Load from a CSV file """
-        try:
-            fn = cls.__name__ + ".csv"
-            with open(fn, newline="") as myFile:
-                reader = csv.DictReader(myFile)
-                lst = []
-                for x in reader:
-                    for i, n in x.items():
-                        x[i] = int(n)
-                    lst.append(x)
-                return ([cls.create(**objt) for objt in lst])
-        except FileNotFoundError:
-            return ([])
-
-    @staticmethod
-    def draw(list_rectangles, list_squares):
-        """ Draw the rectangles and squares """
-        shapes = []
-        if list_rectangles:
-            shapes.extend(list_rectangles)
-        if list_squares:
-            shapes.extend(list_squares)
-        pen = turtle.Turtle()
-        pen.pen(pencolor='black', pendown=False, pensize=2, shown=False)
-        for shape in shapes:
-            pen.penup()
-            pen.setpos(shape.x, shape.y)
-            pen.pendown()
-            pen.forward(shape.width)
-            pen.right(90)
-            pen.forward(shape.height)
-            pen.right(90)
-            pen.forward(shape.width)
-            pen.right(90)
-            pen.forward(shape.height)
-            pen.right(90)
+        Rectangle.save_to_file([Rectangle(1, 2)])
+        with open("Rectangle.json") as file:
+            self.assertEqual(file.read(),
+                             '[{"id": 1, "width": 1, '
+                             '"height": 2, "x": 0, "y": 0}]')
