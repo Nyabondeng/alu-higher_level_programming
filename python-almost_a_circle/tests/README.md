@@ -1,1 +1,1 @@
-My tests
+Tests
