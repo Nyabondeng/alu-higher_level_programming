@@ -1,15 +1,14 @@
 #!/usr/bin/python3
-"""Function that prints a square with a # characater"""
+""""Doc"""
 
 
 def print_square(size):
-    """Presents a square with a # character"""
+    """"Doc"""
     if not isinstance(size, (int,)):
         raise TypeError("size must be an integer")
 
     if size < 0:
         raise ValueError("size must be >= 0")
 
-    for i in range(size):
-        [print("#", end="") for k in range(size)]
-        print("")
+    for _ in range(size):
+        print("#" * size)
